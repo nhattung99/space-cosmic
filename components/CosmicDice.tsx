@@ -86,14 +86,21 @@ export default function CosmicDice() {
     setRotation({ x: tempX, y: tempY });
 
     try {
-      const response = await fetch('/api/random');
+      const response = await fetch('/api/random', {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to fetch cTRNG from space.');
       }
 
-      const { randomHex, timestamp, provider } = data;
+      const { randomHex, timestamp, provider, requestId } = data;
 
       // Extract dice value strictly from cosmic entropy
       // Formula: (Number(BigInt(randomHex) % 6n)) + 1
@@ -117,7 +124,7 @@ export default function CosmicDice() {
       // Wait for dice landing transition (4s in css) to display results
       setTimeout(() => {
         // Unique ID from slice of random hex and timestamp
-        const rollId = `${cleanHex.slice(0, 12)}-${new Date(timestamp).getTime()}`;
+        const rollId = requestId || `${cleanHex.slice(0, 12)}-${new Date(timestamp).getTime()}`;
 
         const newRoll: RollRecord = {
           id: rollId,
@@ -125,7 +132,8 @@ export default function CosmicDice() {
           randomHex: '0x' + cleanHex,
           timestamp,
           provider,
-          verified: true
+          verified: true,
+          requestId,
         };
 
         setCurrentRoll(newRoll);
@@ -267,6 +275,12 @@ export default function CosmicDice() {
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-purple-400" /> Timestamp:</span>
                     <span className="text-slate-300">{new Date(currentRoll.timestamp).toLocaleTimeString()}</span>
                   </div>
+                  {currentRoll.requestId && (
+                    <div className="flex justify-between">
+                      <span className="flex items-center gap-1"><Hash className="w-3 h-3 text-purple-400" /> Request ID:</span>
+                      <span className="text-slate-300 truncate max-w-[140px]" title={currentRoll.requestId}>{currentRoll.requestId}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-emerald-400" /> Verification:</span>
                     <span className="text-emerald-400 font-semibold uppercase tracking-wider text-[10px]">VERIFIED OK</span>

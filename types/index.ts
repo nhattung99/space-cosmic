@@ -5,6 +5,7 @@ export interface RollRecord {
   timestamp: string;
   provider: string;
   verified: boolean;
+  requestId?: string;
 }
 
 export interface RollStats {
