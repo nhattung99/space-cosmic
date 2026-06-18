@@ -86,7 +86,7 @@ export default function CosmicDice() {
     setRotation({ x: tempX, y: tempY });
 
     try {
-      const response = await fetch('/api/random', {
+      const response = await fetch(`/api/random?t=${Date.now()}`, {
         method: 'GET',
         cache: 'no-store',
         headers: {
