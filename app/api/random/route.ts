@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { getOrbitportSDK } from "@/lib/orbitport";
+import { fetch as undiciFetch } from "undici";
+
+// Override Next.js patched fetch with native undici fetch to completely bypass Next.js data cache for the Orbitport SDK
+if (typeof globalThis !== 'undefined') {
+  (globalThis as any).fetch = undiciFetch;
+}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

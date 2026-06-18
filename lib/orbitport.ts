@@ -20,6 +20,7 @@ export function getOrbitportSDK(): OrbitportSDK {
         clientId,
         clientSecret,
       },
+      debug: true,
     });
   }
   return sdk;
